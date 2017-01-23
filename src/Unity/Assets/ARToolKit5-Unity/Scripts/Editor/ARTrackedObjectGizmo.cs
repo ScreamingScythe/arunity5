@@ -147,7 +147,7 @@ class ARTrackedObjectGizmo
 			float biggestSide = Math.Max(pattWidth, pattHeight);
 			Vector3 origin = mat.GetColumn(3);
 			Vector3 right = mat.GetColumn(0);
-			Vector3 up = mat.GetColumn(1);
+			Vector3 up = mat.GetColumn(2);
 			Vector3 centre = origin + right*0.5f*pattWidth + up*0.5f*pattHeight;
 
         	//float d = selected ? 1.0f : 0.0f;

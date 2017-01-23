@@ -103,15 +103,15 @@ public class ARTrackedObject : MonoBehaviour
 
 	void Start()
 	{
-		//ARController.Log(LogTag + "Start()");
+		//ARController.Log(LogTag + "Start()");        
 
-		if (Application.isPlaying) {
-			// In Player, set initial visibility to not visible.
-			for (int i = 0; i < this.transform.childCount; i++) this.transform.GetChild(i).gameObject.SetActive(false);
-		} else {
-			// In Editor, set initial visibility to visible.
-			for (int i = 0; i < this.transform.childCount; i++) this.transform.GetChild(i).gameObject.SetActive(true);
-		}
+        //if (Application.isPlaying) {
+        //	// In Player, set initial visibility to not visible.
+        //	for (int i = 0; i < this.transform.childCount; i++) this.transform.GetChild(i).gameObject.SetActive(false);
+        //} else {
+        //	// In Editor, set initial visibility to visible.
+        //	for (int i = 0; i < this.transform.childCount; i++) this.transform.GetChild(i).gameObject.SetActive(true);
+        //}
 	}
 
 	// Use LateUpdate to be sure the ARMarker has updated before we try and use the transformation.
@@ -147,7 +147,7 @@ public class ARTrackedObject : MonoBehaviour
 							visible = visibleOrRemain = true;
 							if (eventReceiver != null) eventReceiver.BroadcastMessage("OnMarkerFound", marker, SendMessageOptions.DontRequireReceiver);
 
-							for (int i = 0; i < this.transform.childCount; i++) this.transform.GetChild(i).gameObject.SetActive(true);
+							//for (int i = 0; i < this.transform.childCount; i++) this.transform.GetChild(i).gameObject.SetActive(true);
 						}
 
                         Matrix4x4 pose;
@@ -173,7 +173,7 @@ public class ARTrackedObject : MonoBehaviour
 						if (visibleOrRemain && (timeNow - timeTrackingLost >= secondsToRemainVisible)) {
 							visibleOrRemain = false;
 							if (eventReceiver != null) eventReceiver.BroadcastMessage("OnMarkerLost", marker, SendMessageOptions.DontRequireReceiver);
-							for (int i = 0; i < this.transform.childCount; i++) this.transform.GetChild(i).gameObject.SetActive(false);
+                            //for (int i = 0; i < this.transform.childCount; i++) this.transform.GetChild(i).gameObject.SetActive(false);
 						}
 					}
 				} // marker

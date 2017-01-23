@@ -337,9 +337,21 @@ public class ARMarker : MonoBehaviour
 				// Need to convert to Unity's left-hand coordinate system where marker lies in x-y plane with right in direction of +x,
 				// up in direction of +y, and forward (towards viewer) in direction of -z.
 				transformationMatrix = ARUtilityFunctions.LHMatrixFromRHMatrix(matrixRaw);
+
+                transformationMatrix = SwapYZ(transformationMatrix);
 			}
 		}
     }
+
+    public static Matrix4x4 SwapYZ(Matrix4x4 arg)
+    {
+        Vector4 r1 = arg.GetColumn(1);
+        Vector4 r2 = arg.GetColumn(2);
+        arg.SetColumn(1, -r2);
+        arg.SetColumn(2, r1);
+        return arg;
+    }
+
 	
 	// Unload any underlying ARToolKit structures, and clear the UID.
 	public void Unload()

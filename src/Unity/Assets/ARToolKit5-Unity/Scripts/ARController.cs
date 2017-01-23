@@ -113,8 +113,8 @@ public class ARController : MonoBehaviour
 	public int BackgroundLayer0 = 8;
 
 	// Config. out.
-	private int _videoWidth0 = 0;
-	private int _videoHeight0 = 0;
+	public int _videoWidth0 = 0;
+    public int _videoHeight0 = 0;
 	private int _videoPixelSize0 = 0;
 	private string _videoPixelFormatString0 = "";
 	private Matrix4x4 _videoProjectionMatrix0;
@@ -123,7 +123,7 @@ public class ARController : MonoBehaviour
 	private GameObject _videoBackgroundMeshGO0 = null; // The GameObject which holds the MeshFilter and MeshRenderer for the background video, and also the Camera object(s) used to render them. 
 	private Color[] _videoColorArray0 = null; // An array used to fetch pixels from the native side, only if not using native GL texturing.
 	private Color32[] _videoColor32Array0 = null; // An array used to fetch pixels from the native side, only if not using native GL texturing.
-	private Texture2D _videoTexture0 = null;  // Texture object with the video image.
+    private Texture2D _videoTexture0 = null;  // Texture object with the video image.
 	private Material _videoMaterial0 = null;  // Material which uses our "VideoPlaneNoLight" shader, and paints itself with _videoTexture0.
 
 	// Stereo config.
@@ -180,7 +180,15 @@ public class ARController : MonoBehaviour
 	public bool ContentFlipV = false;
 	public ContentAlign ContentAlign = ContentAlign.Center;
 
-	//private int _frameStatsCount = 0;
+    private bool _haveNewFrame;
+    public Texture2D GetNewCameraFrame()
+    {
+        if (!_haveNewFrame) return null;
+        _haveNewFrame = false;
+        return _videoTexture0;
+    }
+
+    //private int _frameStatsCount = 0;
 	//private float _frameStatsTimeUpdateTexture = 0.0f;
 	//private float _frameStatsTimeSetPixels = 0.0f;
 	//private float _frameStatsTimeApply = 0.0f;
@@ -737,6 +745,7 @@ public class ARController : MonoBehaviour
 		if (gotFrame) {
 		    if (_sceneConfiguredForVideo && UseVideoBackground) {
 	        	UpdateTexture();
+                _haveNewFrame = true;
         	}
 		}
 
@@ -1629,7 +1638,7 @@ public class ARController : MonoBehaviour
         // If there is a logCallback then use that to handle the log message. Otherwise simply
         // print out on the debug console.
         if (logCallback != null) logCallback(msg);
-        else Debug.Log(msg);
+        //else Debug.Log(msg);
     }
 
     private void CalculateFPS()
