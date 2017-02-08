@@ -149,12 +149,13 @@ public class ARMarker : MonoBehaviour
     void Awake()
     {
 		//ARController.Log(LogTag + "ARMarker.Awake()");
-        UID = NO_ID;
+        UID = NO_ID;      
     }
 	
 	public void OnEnable()
 	{
 		//ARController.Log(LogTag + "ARMarker.OnEnable()");
+        //Debug.Log(LogTag + " OnEnable");
 		Load();
 	}
 	
@@ -338,9 +339,30 @@ public class ARMarker : MonoBehaviour
 				// up in direction of +y, and forward (towards viewer) in direction of -z.
 				transformationMatrix = ARUtilityFunctions.LHMatrixFromRHMatrix(matrixRaw);
 
-                transformationMatrix = SwapYZ(transformationMatrix);
+                transformationMatrix = ARCTransformation(transformationMatrix);
 			}
 		}
+    }
+
+    public Matrix4x4 ARCTransformation(Matrix4x4 arg)
+    {
+        arg = SwapYZ(arg);
+        float NFTMax = Mathf.Max(NFTWidth, NFTHeight);
+        
+        //set 0,0 to center
+        Matrix4x4 m = Matrix4x4.identity;
+        m.m03 = NFTWidth * 0.5f;
+        m.m23 = NFTHeight * 0.5f;
+        arg = arg * m;
+
+        //fix scale
+        m = Matrix4x4.identity;
+        m.m00 = NFTMax;
+        m.m11 = NFTMax;
+        m.m22 = NFTMax;
+        arg = arg * m;
+
+        return arg;
     }
 
     public static Matrix4x4 SwapYZ(Matrix4x4 arg)
@@ -350,6 +372,17 @@ public class ARMarker : MonoBehaviour
         arg.SetColumn(1, -r2);
         arg.SetColumn(2, r1);
         return arg;
+    }
+
+    private ARTrackedObject _trackedObject;
+    public ARTrackedObject TrackedObject
+    {
+        get
+        {
+            if (_trackedObject == null)
+                _trackedObject = GameObject.FindObjectsOfType<ARTrackedObject>().First(x => x.MarkerTag == Tag);
+            return _trackedObject;
+        }
     }
 
 	

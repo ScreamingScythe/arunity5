@@ -113,7 +113,7 @@ public class ARController : MonoBehaviour
 	public int BackgroundLayer0 = 8;
 
 	// Config. out.
-	public int _videoWidth0 = 0;
+    public int _videoWidth0 = 0;
     public int _videoHeight0 = 0;
 	private int _videoPixelSize0 = 0;
 	private string _videoPixelFormatString0 = "";
@@ -355,9 +355,9 @@ public class ARController : MonoBehaviour
 				break;
 			case RuntimePlatform.IPhonePlayer:					// Unity Player on iOS.
 				break;
-			case RuntimePlatform.MetroPlayerX86:				// Unity Player on Windows Store X86.
-			case RuntimePlatform.MetroPlayerX64:				// Unity Player on Windows Store X64.
-			case RuntimePlatform.MetroPlayerARM:				// Unity Player on Windows Store ARM.
+			case RuntimePlatform.WSAPlayerX86:				// Unity Player on Windows Store X86.
+            case RuntimePlatform.WSAPlayerX64:				// Unity Player on Windows Store X64.
+            case RuntimePlatform.WSAPlayerARM:				// Unity Player on Windows Store ARM.
 				PluginFunctions.arwRegisterLogCallback(Log);
 				break;
 			default:
@@ -455,9 +455,9 @@ public class ARController : MonoBehaviour
 				break;
             case RuntimePlatform.IPhonePlayer:
 				break;
-			case RuntimePlatform.MetroPlayerX86:
-			case RuntimePlatform.MetroPlayerX64:
-			case RuntimePlatform.MetroPlayerARM:
+			case RuntimePlatform.WSAPlayerX86:
+			case RuntimePlatform.WSAPlayerX64:
+			case RuntimePlatform.WSAPlayerARM:
 				PluginFunctions.arwRegisterLogCallback(null);
 				break;
 			default:
@@ -540,9 +540,9 @@ public class ARController : MonoBehaviour
 				videoConfiguration0 = videoConfigurationiOS0 + (_useNativeGLTexturing || !AllowNonRGBVideo ? " -format=BGRA" : "");
 				videoConfiguration1 = videoConfigurationiOS1 + (_useNativeGLTexturing || !AllowNonRGBVideo ? " -format=BGRA" : "");
 				break;
-			case RuntimePlatform.MetroPlayerX86:
-			case RuntimePlatform.MetroPlayerX64:
-			case RuntimePlatform.MetroPlayerARM:
+			case RuntimePlatform.WSAPlayerX86:
+            case RuntimePlatform.WSAPlayerX64:
+            case RuntimePlatform.WSAPlayerARM:
 				videoConfiguration0 = videoConfigurationWindowsStore0;
 				videoConfiguration1 = videoConfigurationWindowsStore1;
 				break;
@@ -728,10 +728,13 @@ public class ARController : MonoBehaviour
 				// On platforms with multithreaded OpenGL rendering, we need to
 				// tell the native plugin the texture ID in advance, so do that now.
 				if (_useNativeGLTexturing) {
-					if (Application.platform != RuntimePlatform.IPhonePlayer && Application.platform != RuntimePlatform.Android) {
-						if (!VideoIsStereo) PluginFunctions.arwSetUnityRenderEventUpdateTextureGLTextureID(_videoTexture0.GetNativeTextureID());
+					if (Application.platform != RuntimePlatform.IPhonePlayer && Application.platform != RuntimePlatform.Android)
+                    {
+                        #pragma warning disable 0618
+                        if (!VideoIsStereo) PluginFunctions.arwSetUnityRenderEventUpdateTextureGLTextureID(_videoTexture0.GetNativeTextureID());
 						else PluginFunctions.arwSetUnityRenderEventUpdateTextureGLStereoTextureIDs(_videoTexture0.GetNativeTextureID(), _videoTexture1.GetNativeTextureID());
-					}
+                        #pragma warning restore 0618
+                    }
 				}
 
 				Log (LogTag + "Scene configured for video.");
@@ -1100,11 +1103,14 @@ public class ARController : MonoBehaviour
 					
 					// As of 2013-09-23, mobile platforms don't support GL.IssuePluginEvent().
 					// See http://docs.unity3d.com/Documentation/Manual/NativePluginInterface.html.
-					if (Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.Android) {
-						PluginFunctions.arwUpdateTextureGL(_videoTexture0.GetNativeTextureID());
-					} else {
+					if (Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.Android)
+                    {
+                        #pragma warning disable 0618
+                        PluginFunctions.arwUpdateTextureGL(_videoTexture0.GetNativeTextureID());
+                        #pragma warning restore 0618
+                    } else {
 						//Log(LogTag + "Calling GL.IssuePluginEvent");
-						GL.IssuePluginEvent((int)ARW_UNITY_RENDER_EVENTID.UPDATE_TEXTURE_GL);
+						GL.IssuePluginEvent(System.IntPtr.Zero, (int)ARW_UNITY_RENDER_EVENTID.UPDATE_TEXTURE_GL);                       
 					}
 					
 				} else {
@@ -1171,11 +1177,14 @@ public class ARController : MonoBehaviour
 					
 					// As of 2013-09-23, mobile platforms don't support GL.IssuePluginEvent().
 					// See http://docs.unity3d.com/Documentation/Manual/NativePluginInterface.html.
-					if (Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.Android) {
-						PluginFunctions.arwUpdateTextureGLStereo(_videoTexture0.GetNativeTextureID(), _videoTexture1.GetNativeTextureID());
-					} else {
+					if (Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.Android)
+                    {
+                        #pragma warning disable 0618
+                        PluginFunctions.arwUpdateTextureGLStereo(_videoTexture0.GetNativeTextureID(), _videoTexture1.GetNativeTextureID());
+                        #pragma warning restore 0618
+                    } else {
 						//Log(LogTag + "Calling GL.IssuePluginEvent");
-						GL.IssuePluginEvent((int)ARW_UNITY_RENDER_EVENTID.UPDATE_TEXTURE_GL_STEREO);
+                        GL.IssuePluginEvent(System.IntPtr.Zero, (int)ARW_UNITY_RENDER_EVENTID.UPDATE_TEXTURE_GL_STEREO);
 					}
 
 				} else {
@@ -1314,7 +1323,7 @@ public class ARController : MonoBehaviour
 		MeshFilter filter = vbmgo.AddComponent<MeshFilter>();
 		filter.mesh = newVideoMesh(ContentFlipH, !ContentFlipV, textureScaleU, textureScaleV); // Invert flipV because ARToolKit video frame is top-down, Unity's is bottom-up.
 		MeshRenderer meshRenderer = vbmgo.AddComponent<MeshRenderer>();
-		meshRenderer.castShadows = false;
+        meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 		meshRenderer.receiveShadows = false;
 		vbmgo.GetComponent<Renderer>().material = vbm;
 		

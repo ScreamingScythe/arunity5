@@ -201,19 +201,13 @@ public class ARCamera : MonoBehaviour
 			
 			if (marker.Visible) {
 				
-				Matrix4x4 pose;
-				if (Optical && opticalSetupOK) {
-					pose = (opticalViewMatrix * marker.TransformationMatrix).inverse;
-				} else {
-					pose = marker.TransformationMatrix.inverse;
-				}
-				
+				//Matrix4x4 pose;
+				if (Optical && opticalSetupOK)
+                    pose = ((opticalViewMatrix * marker.TransformationMatrix) * marker.TrackedObject.transform.worldToLocalMatrix).inverse;
+				else
+                    pose = (marker.TransformationMatrix * marker.TrackedObject.transform.worldToLocalMatrix).inverse;		
+		
 				arPosition = ARUtilityFunctions.PositionFromMatrix(pose);
-				// Camera orientation: In ARToolKit, zero rotation of the camera corresponds to looking vertically down on a marker
-				// lying flat on the ground. In Unity however, if we still treat markers as being flat on the ground, we clash with Unity's
-				// camera "rotation", because an unrotated Unity camera is looking horizontally.
-				// So we choose to treat an unrotated marker as standing vertically, and apply a transform to the scene to
-				// to get it to lie flat on the ground.
 				arRotation = ARUtilityFunctions.QuaternionFromMatrix(pose);
 				
 				if (!arVisible) {
@@ -229,12 +223,15 @@ public class ARCamera : MonoBehaviour
 			}
 		}
 	}
+
+    Matrix4x4 pose;
+    //Vector3 arScale;
 	
 	protected virtual void ApplyTracking()
 	{
 		if (arVisible) {
-			transform.localPosition = arPosition; // TODO: Change to transform.position = PositionFromMatrix(origin.transform.localToWorldMatrix * pose) etc;
-			transform.localRotation = arRotation;
+			transform.position = arPosition; // TODO: Change to transform.position = PositionFromMatrix(origin.transform.localToWorldMatrix * pose) etc;
+			transform.rotation = arRotation;
 		}
 	}
 	

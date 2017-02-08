@@ -139,8 +139,9 @@ class ARTrackedObjectGizmo
 
 	private static void DrawNFTMarker(ARMarker m, Matrix4x4 mat, bool selected) 
     {
-        float pattWidth = m.NFTWidth;
-		float pattHeight = m.NFTHeight;
+        const float UPSCALE = 5.0f;
+        float pattWidth = m.NFTWidth * UPSCALE;
+        float pattHeight = m.NFTHeight * UPSCALE;
 		//Debug.Log("DrawNFTMarker got pattWidth=" + pattWidth + ", pattHeight=" + pattHeight + ".");
 		if (pattWidth > 0.0f && pattHeight > 0.0f) {
 
@@ -148,17 +149,17 @@ class ARTrackedObjectGizmo
 			Vector3 origin = mat.GetColumn(3);
 			Vector3 right = mat.GetColumn(0);
 			Vector3 up = mat.GetColumn(2);
-			Vector3 centre = origin + right*0.5f*pattWidth + up*0.5f*pattHeight;
+            Vector3 centre = origin;// +right * 0.5f * pattWidth + up * 0.5f * pattHeight;
 
         	//float d = selected ? 1.0f : 0.0f;
-     
-			DrawRectangle(centre, up, right, pattWidth, pattHeight, selected ? MarkerBorderSelected : MarkerBorderUnselected);
-			DrawRectangle(centre, up, right, pattWidth + biggestSide*0.05f, pattHeight + biggestSide*0.05f, selected ? MarkerEdgeSelected : MarkerEdgeUnselected);
+            
+            DrawRectangle(centre, up, right, pattWidth , pattHeight, selected ? MarkerBorderSelected : MarkerBorderUnselected);
+            DrawRectangle(centre, up, right, pattWidth + biggestSide * 0.05f, pattHeight + biggestSide * 0.05f, selected ? MarkerEdgeSelected : MarkerEdgeUnselected);
 
         	//Gizmos.DrawGUITexture(new Rect(centre.x, centre.y, 20, 20), m.MarkerImage);
 		
-			float wordUnitSize = pattHeight * 0.02f;
-			DrawWord(m.Tag, wordUnitSize, centre - up*(pattHeight*0.6f + (wordUnitSize*4)) - right*pattWidth*0.525f, up, right*0.5f);
+			float wordUnitSize = pattHeight * 0.01f;
+			DrawWord(m.Tag, wordUnitSize, centre - up*(pattHeight *0.6f + (wordUnitSize*4)) - right*pattWidth*0.525f, up, right*0.5f);
 		}
 	}
 	

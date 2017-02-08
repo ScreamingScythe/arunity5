@@ -127,7 +127,8 @@ public class AROrigin : MonoBehaviour
 		foreach (ARMarker m in markersEligibleForBaseMarker) {
 			if (m.Visible) {
 				baseMarker = m;
-				//ARController.Log("Marker " + m.UID + " became base marker.");
+                m.TrackedObject.RevertTransform();
+				Debug.Log("Marker " + m.UID + " became base marker.");
 				break;
 			}
 		}

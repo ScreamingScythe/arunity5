@@ -101,9 +101,21 @@ public static class ARUtilityFunctions
 	}
 #endif
 
+    public static Vector3 ScaleFromMatrix(Matrix4x4 m)
+    {
+        Vector3 scale = new Vector3(
+            m.GetColumn(0).magnitude,
+            m.GetColumn(1).magnitude,
+            m.GetColumn(2).magnitude
+            );
+        if (Vector3.Cross(m.GetColumn(0), m.GetColumn(1)).normalized != (Vector3)m.GetColumn(2).normalized)
+            scale.x *= -1;
+        return scale;
+    }
+
 	public static Vector3 PositionFromMatrix(Matrix4x4 m)
 	{
-	    return m.GetColumn(3);
+	    return m.GetColumn(3) ; //подеить на 4 элемент?
 	}
 
 	// Convert from right-hand coordinate system with <normal vector> in direction of +x,

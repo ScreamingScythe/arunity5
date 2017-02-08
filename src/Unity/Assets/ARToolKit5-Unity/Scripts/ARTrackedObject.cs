@@ -90,6 +90,18 @@ public class ARTrackedObject : MonoBehaviour
 		return _marker;
 	}
 
+    Quaternion _startRot;
+    Vector3 _startPos;
+    Vector3 _startScale;
+
+    public void RevertTransform()
+    {
+        //Debug.Log("Reverted! " + name);
+        transform.position = _startPos;
+        transform.rotation = _startRot;
+        transform.localScale = _startScale;
+    }
+
 	// Return the origin associated with this component.
 	// Uses cached value if available, otherwise performs a find operation.
 	public virtual AROrigin GetOrigin()
@@ -103,6 +115,10 @@ public class ARTrackedObject : MonoBehaviour
 
 	void Start()
 	{
+        _startPos = transform.position;
+        _startRot = transform.rotation;
+        _startScale = transform.localScale;
+
 		//ARController.Log(LogTag + "Start()");        
 
         //if (Application.isPlaying) {
@@ -114,11 +130,25 @@ public class ARTrackedObject : MonoBehaviour
         //}
 	}
 
+    public static void SetGlobalScale(Transform arg, Vector3 scale)
+    {
+        Vector3 v = scale;
+        Transform t = arg.parent;
+        while (t != null)
+        {
+            v.x /= t.localScale.x;
+            v.y /= t.localScale.y;
+            v.z /= t.localScale.z;
+            t = t.parent;
+        }
+        arg.localScale = v;
+    }
+
 	// Use LateUpdate to be sure the ARMarker has updated before we try and use the transformation.
 	void LateUpdate()
 	{
 		// Local scale is always 1 for now
-		transform.localScale = Vector3.one;
+		//transform.localScale = Vector3.one;
 		
 		// Update tracking if we are running in the Player.
 		if (Application.isPlaying) {
@@ -150,15 +180,13 @@ public class ARTrackedObject : MonoBehaviour
 							//for (int i = 0; i < this.transform.childCount; i++) this.transform.GetChild(i).gameObject.SetActive(true);
 						}
 
-                        Matrix4x4 pose;
-                        if (marker == baseMarker) {
-                            // If this marker is the base, no need to take base inverse etc.
-                            pose = origin.transform.localToWorldMatrix;
-                        } else {
-						    pose = (origin.transform.localToWorldMatrix * baseMarker.TransformationMatrix.inverse * marker.TransformationMatrix);
-						}
-						transform.position = ARUtilityFunctions.PositionFromMatrix(pose);
-						transform.rotation = ARUtilityFunctions.QuaternionFromMatrix(pose);
+                        if (marker != baseMarker) 
+                        {
+                            Matrix4x4 pose = baseMarker.TrackedObject.transform.localToWorldMatrix * baseMarker.TransformationMatrix.inverse * marker.TransformationMatrix;
+                            transform.position = ARUtilityFunctions.PositionFromMatrix(pose);
+                            transform.rotation = ARUtilityFunctions.QuaternionFromMatrix(pose);
+                            SetGlobalScale(transform, ARUtilityFunctions.ScaleFromMatrix(pose));
+                        }
 
 						if (eventReceiver != null) eventReceiver.BroadcastMessage("OnMarkerTracked", marker, SendMessageOptions.DontRequireReceiver);
 
