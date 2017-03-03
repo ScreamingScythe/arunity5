@@ -72,6 +72,11 @@ public enum ARWMarkerOption : int {
 public class ARMarker : MonoBehaviour
 {
 
+    public delegate string DataSetsPathDelegate();
+
+    public static DataSetsPathDelegate OnDataSetPath;
+
+
     public readonly static Dictionary<MarkerType, string> MarkerTypeNames = new Dictionary<MarkerType, string>
     {
 		{MarkerType.Square, "Single AR pattern"},
@@ -236,27 +241,46 @@ public class ARMarker : MonoBehaviour
 				}
                 break;
 
-			
-			case MarkerType.NFT:
-				#if !UNITY_METRO
-				if (dir.Contains("://")) {
-					// On Android, we need to unpack the StreamingAssets from the .jar file in which
-					// they're archived into the native file system.
-					dir = Application.temporaryCachePath;
-					foreach (string ext in NFTDataExts) {
-						string basename = NFTDataName + "." + ext;
-						if (!unpackStreamingAssetToCacheDir(basename)) {
-							dir = "";
-							break;
-						}
-					}
-				}
-				#endif
-			
-				if (!string.IsNullOrEmpty(dir) && !string.IsNullOrEmpty(NFTDataName)) {
-					cfg = "nft;" + System.IO.Path.Combine(dir, NFTDataName);
-				}
-				break;
+
+            case MarkerType.NFT:
+#if !UNITY_METRO
+                if (OnDataSetPath == null)
+                {
+                    if (dir.Contains("://"))
+                    {
+                        dir = Application.temporaryCachePath;
+                        foreach (string ext in NFTDataExts)
+                        {
+                            string basename = NFTDataName + "." + ext;
+                            if (!unpackStreamingAssetToCacheDir(basename))
+                            {
+                                dir = "";
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    dir = OnDataSetPath();
+                    foreach (string ext in NFTDataExts)
+                    {
+                        string dataset = System.IO.Path.Combine(dir, NFTDataName + "." + ext);
+                        if (!File.Exists(dataset))
+                        {
+                            Debug.Log("ARMarker: Error load " + dataset);
+                            dir = "";
+                            break;
+                        }
+                    }
+                }
+#endif
+
+                if (!string.IsNullOrEmpty(dir) && !string.IsNullOrEmpty(NFTDataName))
+                {
+                    cfg = "nft;" + System.IO.Path.Combine(dir, NFTDataName);
+                }
+                break;
 
             default:
                 // Unknown marker type?
@@ -338,7 +362,6 @@ public class ARMarker : MonoBehaviour
 				// Need to convert to Unity's left-hand coordinate system where marker lies in x-y plane with right in direction of +x,
 				// up in direction of +y, and forward (towards viewer) in direction of -z.
 				transformationMatrix = ARUtilityFunctions.LHMatrixFromRHMatrix(matrixRaw);
-
                 transformationMatrix = ARCTransformation(transformationMatrix);
 			}
 		}

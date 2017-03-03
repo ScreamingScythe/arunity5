@@ -473,7 +473,7 @@ public class ARController : MonoBehaviour
 	{
 		//Log(LogTag + "ARController.OnDestroy()");
 
-		Log(LogTag + "Shutting down ARToolKit");
+		Debug.Log(LogTag + "Shutting down ARToolKit");
 		// arwShutdownAR() causes everything ARToolKit holds to be unloaded.
 		if (!PluginFunctions.arwShutdownAR ()) {
 			Log(LogTag + "Error shutting down ARToolKit.");
@@ -1641,6 +1641,7 @@ public class ARController : MonoBehaviour
     {
         // Add the new log message to the collection. If the collection has grown too large
         // then remove the oldest messages.
+        Debug.Log(msg);
         logMessages.Add(msg);
         while (logMessages.Count > MaximumLogMessages) logMessages.RemoveAt(0);
 
