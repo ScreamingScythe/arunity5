@@ -178,7 +178,7 @@ public class ARMarker : MonoBehaviour
 			WWW unpackerWWW = new WWW(file);
 			while (!unpackerWWW.isDone) { } // This will block in the webplayer. TODO: switch to co-routine.
 			if (!string.IsNullOrEmpty(unpackerWWW.error)) {
-				ARController.Log(LogTag + "Error unpacking '" + file + "'");
+                Debug.LogError("ARTK: " + LogTag + "Error unpacking '" + file + "'");
 				return (false);
 			}
 			File.WriteAllBytes(System.IO.Path.Combine(Application.temporaryCachePath, basename), unpackerWWW.bytes); // 64MB limit on File.WriteAllBytes.
@@ -243,7 +243,7 @@ public class ARMarker : MonoBehaviour
 
 
             case MarkerType.NFT:
-#if !UNITY_METRO
+#if !UNITY_METRO                
                 if (OnDataSetPath == null)
                 {
                     if (dir.Contains("://"))
@@ -268,7 +268,7 @@ public class ARMarker : MonoBehaviour
                         string dataset = System.IO.Path.Combine(dir, NFTDataName + "." + ext);
                         if (!File.Exists(dataset))
                         {
-                            Debug.Log("ARMarker: Error load " + dataset);
+                            Debug.LogError("ARMarker: Error load " + dataset);
                             dir = "";
                             break;
                         }
@@ -279,6 +279,7 @@ public class ARMarker : MonoBehaviour
                 if (!string.IsNullOrEmpty(dir) && !string.IsNullOrEmpty(NFTDataName))
                 {
                     cfg = "nft;" + System.IO.Path.Combine(dir, NFTDataName);
+                    //Debug.LogWarning("cfg --------------- " + cfg);
                 }
                 break;
 
@@ -292,7 +293,7 @@ public class ARMarker : MonoBehaviour
 		if (!string.IsNullOrEmpty(cfg)) {
         	UID = PluginFunctions.arwAddMarker(cfg);
 			if (UID == NO_ID) {
-				ARController.Log(LogTag + "Error loading marker.");
+                Debug.LogError("ARTK: " + LogTag + "Error loading marker.");
 			} else {
 
 				// Marker loaded. Do any additional configuration.

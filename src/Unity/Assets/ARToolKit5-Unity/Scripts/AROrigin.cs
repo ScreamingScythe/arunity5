@@ -107,7 +107,7 @@ public class AROrigin : MonoBehaviour
 					markersEligibleForBaseMarker.Add(m);
 				}
 			}
-			ARController.Log(LogTag + "Found " + markersEligibleForBaseMarker.Count + " markers eligible to become base marker.");
+            Debug.Log("ARTK: " + LogTag + "Found " + markersEligibleForBaseMarker.Count + " markers eligible to become base marker.");
 		}
 	}
 

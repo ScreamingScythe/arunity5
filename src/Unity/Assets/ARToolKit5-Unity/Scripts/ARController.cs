@@ -330,9 +330,9 @@ public class ARController : MonoBehaviour
         if (PluginFunctions.arwInitialiseAR(TemplateSize, TemplateCountMax)) {
 			// ARToolKit version number
 			_version = PluginFunctions.arwGetARToolKitVersion();
-			Log(LogTag + "ARToolKit version " + _version + " initialised.");
+			Debug.Log("ARTK: " + LogTag + "ARToolKit version " + _version + " initialised.");
 		} else {
-            Log(LogTag + "Error initialising ARToolKit");
+            Debug.LogError("ARTK: " + LogTag + "Error initialising ARToolKit");
         }
 	}
 
@@ -476,7 +476,7 @@ public class ARController : MonoBehaviour
 		Debug.Log(LogTag + "Shutting down ARToolKit");
 		// arwShutdownAR() causes everything ARToolKit holds to be unloaded.
 		if (!PluginFunctions.arwShutdownAR ()) {
-			Log(LogTag + "Error shutting down ARToolKit.");
+			Debug.LogError("ARTK: " + LogTag + "Error shutting down ARToolKit.");
 		}
 
 		// Classes inheriting from MonoBehavior should set all static member variables to null on unload.
@@ -490,11 +490,11 @@ public class ARController : MonoBehaviour
 	{
 		// Catch attempts to inadvertently call StartAR() twice.
         if (_running) {
-            Log(LogTag + "WARNING: StartAR() called while already running. Ignoring.\n");
+            Debug.LogWarning("ARTK: " + LogTag + "WARNING: StartAR() called while already running. Ignoring.\n");
             return false;
         }
         
-        Log(LogTag + "Starting AR.");
+        Debug.Log("ARTK: " + LogTag + "Starting AR.");
 
 		_sceneConfiguredForVideo = _sceneConfiguredForVideoWaitingMessageLogged = false;
         
@@ -502,9 +502,9 @@ public class ARController : MonoBehaviour
         string renderDevice = SystemInfo.graphicsDeviceVersion;
         _useNativeGLTexturing = !renderDevice.StartsWith("Direct") && UseNativeGLTexturingIfAvailable;
         if (_useNativeGLTexturing) {
-            Log(LogTag + "Render device: " + renderDevice + ", using native GL texturing.");
+            Debug.Log("ARTK: " + LogTag + "Render device: " + renderDevice + ", using native GL texturing.");
         } else {
-            Log(LogTag + "Render device: " + renderDevice + ", using Unity texturing.");
+            Debug.Log("ARTK: " + LogTag + "Render device: " + renderDevice + ", using Unity texturing.");
         }
 
         CreateClearCamera();
@@ -565,7 +565,7 @@ public class ARController : MonoBehaviour
         ta = Resources.Load("ardata/" + videoCParamName0, typeof(TextAsset)) as TextAsset;
         if (ta == null) {		
             // Error - the camera_para.dat file isn't in the right place			
-			Log(LogTag + "StartAR(): Error: Camera parameters file not found at Resources/ardata/" + videoCParamName0 + ".bytes");
+            Debug.LogError("ARTK: " + LogTag + "StartAR(): Error: Camera parameters file not found at Resources/ardata/" + videoCParamName0 + ".bytes");
             return (false);
         }
         cparam0 = ta.bytes;
@@ -573,14 +573,14 @@ public class ARController : MonoBehaviour
 			ta = Resources.Load("ardata/" + videoCParamName1, typeof(TextAsset)) as TextAsset;
 			if (ta == null) {		
 				// Error - the camera_para.dat file isn't in the right place			
-				Log(LogTag + "StartAR(): Error: Camera parameters file not found at Resources/ardata/" + videoCParamName1 + ".bytes");
+                Debug.LogError("ARTK: " + LogTag + "StartAR(): Error: Camera parameters file not found at Resources/ardata/" + videoCParamName1 + ".bytes");
 				return (false);
 			}
 			cparam1 = ta.bytes;
 			ta = Resources.Load("ardata/" + transL2RName, typeof(TextAsset)) as TextAsset;
 			if (ta == null) {		
 				// Error - the transL2R.dat file isn't in the right place			
-				Log(LogTag + "StartAR(): Error: The stereo calibration file not found at Resources/ardata/" + transL2RName + ".bytes");
+                Debug.LogError("ARTK: " + LogTag + "StartAR(): Error: The stereo calibration file not found at Resources/ardata/" + transL2RName + ".bytes");
 				return (false);
 			}
 			transL2R = ta.bytes;
@@ -588,18 +588,18 @@ public class ARController : MonoBehaviour
         
         // Begin video capture and marker detection.
 		if (!VideoIsStereo) {
-			Log(LogTag + "Starting ARToolKit video with vconf '" + videoConfiguration0 + "'.");
+            Debug.Log("ARTK: " + LogTag + "Starting ARToolKit video with vconf '" + videoConfiguration0 + "'.");
 			//_running = PluginFunctions.arwStartRunning(videoConfiguration, cparaName, nearPlane, farPlane);
 			_running = PluginFunctions.arwStartRunningB(videoConfiguration0, cparam0, cparam0.Length, NearPlane, FarPlane);
 		} else {
-			Log(LogTag + "Starting ARToolKit video with vconfL '" + videoConfiguration0 + "', vconfR '" + videoConfiguration1 + "'.");
+            Debug.Log("ARTK: " + LogTag + "Starting ARToolKit video with vconfL '" + videoConfiguration0 + "', vconfR '" + videoConfiguration1 + "'.");
 			//_running = PluginFunctions.arwStartRunningStereo(vconfL, cparaNameL, vconfR, cparaNameR, transL2RName, nearPlane, farPlane);
 			_running = PluginFunctions.arwStartRunningStereoB(videoConfiguration0, cparam0, cparam0.Length, videoConfiguration1, cparam1, cparam1.Length, transL2R, transL2R.Length, NearPlane, FarPlane);
 
 		}
         
         if (!_running) {
-            Log(LogTag + "Error starting running");
+            Debug.LogError("ARTK: " + LogTag + "Error starting running");
 			ARW_ERROR error = (ARW_ERROR)PluginFunctions.arwGetError();
 			if (error == ARW_ERROR.ARW_ERROR_DEVICE_UNAVAILABLE) {
 				showGUIErrorDialogContent = "Unable to start AR tracking. The camera may be in use by another application.";
@@ -611,7 +611,7 @@ public class ARController : MonoBehaviour
         }
         
 		// After calling arwStartRunningB/arwStartRunningStereoB, set ARToolKit configuration.
-        Log(LogTag + "Setting ARToolKit tracking settings.");
+        Debug.Log("ARTK: " + LogTag + "Setting ARToolKit tracking settings.");
         VideoThreshold = currentThreshold;
         VideoThresholdMode = currentThresholdMode;
         LabelingMode = currentLabelingMode;
@@ -636,11 +636,11 @@ public class ARController : MonoBehaviour
             // Wait for the wrapper to confirm video frames have arrived before configuring our video-dependent stuff.
             if (!PluginFunctions.arwIsRunning()) {
 				if (!_sceneConfiguredForVideoWaitingMessageLogged) {
-					Log(LogTag + "UpdateAR: Waiting for ARToolKit video.");
+					Debug.Log("ARTK: " + LogTag + "UpdateAR: Waiting for ARToolKit video.");
 					_sceneConfiguredForVideoWaitingMessageLogged = true;
 				}
             } else {
-				Log(LogTag + "UpdateAR: ARToolKit video is running. Configuring Unity scene for video.");
+				Debug.Log("ARTK: " + LogTag + "UpdateAR: ARToolKit video is running. Configuring Unity scene for video.");
 		
 				// Retrieve ARToolKit video source(s) frame size and format, and projection matrix, and store globally.
 				// Then create the required object(s) to instantiate a mesh/meshes with the frame texture(s).
@@ -651,20 +651,20 @@ public class ARController : MonoBehaviour
 				 
 					bool ok1 = PluginFunctions.arwGetVideoParams(out _videoWidth0, out _videoHeight0, out _videoPixelSize0, out _videoPixelFormatString0);
 					if (!ok1) return false;
-					Log(LogTag + "Video " + _videoWidth0 + "x" + _videoHeight0 + "@" + _videoPixelSize0 + "Bpp (" + _videoPixelFormatString0 + ")");
+					Debug.Log("ARTK: " + LogTag + "Video " + _videoWidth0 + "x" + _videoHeight0 + "@" + _videoPixelSize0 + "Bpp (" + _videoPixelFormatString0 + ")");
 					
 					// ARToolKit projection matrix adjusted for Unity
 					float[] projRaw = new float[16];
 					PluginFunctions.arwGetProjectionMatrix(projRaw);
 					_videoProjectionMatrix0 = ARUtilityFunctions.MatrixFromFloatArray(projRaw);
-					Log(LogTag + "Projection matrix: [" + Environment.NewLine + _videoProjectionMatrix0.ToString().Trim() + "]");
+					Debug.Log("ARTK: " + LogTag + "Projection matrix: [" + Environment.NewLine + _videoProjectionMatrix0.ToString().Trim() + "]");
 					if (ContentRotate90) _videoProjectionMatrix0 = Matrix4x4.TRS(Vector3.zero, Quaternion.AngleAxis(90.0f, Vector3.back), Vector3.one) * _videoProjectionMatrix0;
 					if (ContentFlipV) _videoProjectionMatrix0 = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1.0f, -1.0f, 1.0f)) * _videoProjectionMatrix0;
 					if (ContentFlipH) _videoProjectionMatrix0 = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(-1.0f, 1.0f, 1.0f)) * _videoProjectionMatrix0;
 
 					_videoBackgroundMeshGO0 = CreateVideoBackgroundMesh(0, _videoWidth0, _videoHeight0, BackgroundLayer0, out _videoColorArray0, out _videoColor32Array0, out _videoTexture0, out _videoMaterial0);
 					if (_videoBackgroundMeshGO0 == null || _videoTexture0 == null || _videoMaterial0 == null) {
-						Log (LogTag + "Error: unable to create video mesh.");
+                        Debug.LogError("ARTK: " + LogTag + "Error: unable to create video mesh.");
 					}
 
 				} else {
@@ -672,7 +672,7 @@ public class ARController : MonoBehaviour
 					// ARToolKit stereo video size and format.
 					bool ok1 = PluginFunctions.arwGetVideoParamsStereo(out _videoWidth0, out _videoHeight0, out _videoPixelSize0, out _videoPixelFormatString0, out _videoWidth1, out _videoHeight1, out _videoPixelSize1, out _videoPixelFormatString1);
 					if (!ok1) return false;
-					Log(LogTag + "Video left " + _videoWidth0 + "x" + _videoHeight0 + "@" + _videoPixelSize0 + "Bpp (" + _videoPixelFormatString0 + "), right " + _videoWidth1 + "x" + _videoHeight1 + "@" + _videoPixelSize1 + "Bpp (" + _videoPixelFormatString1 + ")");
+					Debug.Log("ARTK: " + LogTag + "Video left " + _videoWidth0 + "x" + _videoHeight0 + "@" + _videoPixelSize0 + "Bpp (" + _videoPixelFormatString0 + "), right " + _videoWidth1 + "x" + _videoHeight1 + "@" + _videoPixelSize1 + "Bpp (" + _videoPixelFormatString1 + ")");
 					
 					// ARToolKit projection matrices, adjusted for Unity
 					float[] projRaw0 = new float[16];
@@ -680,7 +680,7 @@ public class ARController : MonoBehaviour
 					PluginFunctions.arwGetProjectionMatrixStereo(projRaw0, projRaw1);
 					_videoProjectionMatrix0 = ARUtilityFunctions.MatrixFromFloatArray(projRaw0);
 					_videoProjectionMatrix1 = ARUtilityFunctions.MatrixFromFloatArray(projRaw1);
-					Log(LogTag + "Projection matrix left: [" + Environment.NewLine + _videoProjectionMatrix0.ToString().Trim() + "], right: [" + Environment.NewLine + _videoProjectionMatrix1.ToString().Trim() + "]");
+					Debug.Log("ARTK: " + LogTag + "Projection matrix left: [" + Environment.NewLine + _videoProjectionMatrix0.ToString().Trim() + "], right: [" + Environment.NewLine + _videoProjectionMatrix1.ToString().Trim() + "]");
 					if (ContentRotate90) _videoProjectionMatrix0 = Matrix4x4.TRS(Vector3.zero, Quaternion.AngleAxis(90.0f, Vector3.back), Vector3.one) * _videoProjectionMatrix0;
 					if (ContentRotate90) _videoProjectionMatrix1 = Matrix4x4.TRS(Vector3.zero, Quaternion.AngleAxis(90.0f, Vector3.back), Vector3.one) * _videoProjectionMatrix1;
 					if (ContentFlipV) _videoProjectionMatrix0 = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1.0f, -1.0f, 1.0f)) * _videoProjectionMatrix0;
@@ -691,7 +691,7 @@ public class ARController : MonoBehaviour
 					_videoBackgroundMeshGO0 = CreateVideoBackgroundMesh(0, _videoWidth0, _videoHeight0, BackgroundLayer0, out _videoColorArray0, out _videoColor32Array0, out _videoTexture0, out _videoMaterial0);
 					_videoBackgroundMeshGO1 = CreateVideoBackgroundMesh(1, _videoWidth1, _videoHeight1, BackgroundLayer1, out _videoColorArray1, out _videoColor32Array1, out _videoTexture1, out _videoMaterial1);
 					if (_videoBackgroundMeshGO0 == null || _videoTexture0 == null || _videoMaterial0 == null || _videoBackgroundMeshGO1 == null || _videoTexture1 == null || _videoMaterial1 == null) {
-						Log (LogTag + "Error: unable to create video background mesh.");
+                        Debug.LogError("ARTK: " + LogTag + "Error: unable to create video background mesh.");
 					}
 				}
 	            
@@ -707,7 +707,7 @@ public class ARController : MonoBehaviour
 					// (The case where stereo video source is used with a mono display is not likely to be common.)
 					_videoBackgroundCameraGO0 = CreateVideoBackgroundCamera("Video background", BackgroundLayer0, out _videoBackgroundCamera0);
 					if (_videoBackgroundCameraGO0 == null || _videoBackgroundCamera0 == null) {
-						Log (LogTag + "Error: unable to create video background camera.");
+                        Debug.LogError("ARTK: " + LogTag + "Error: unable to create video background camera.");
 					}
 				} else {
 					// Stereo display.
@@ -715,7 +715,7 @@ public class ARController : MonoBehaviour
 					_videoBackgroundCameraGO0 = CreateVideoBackgroundCamera("Video background (L)", BackgroundLayer0, out _videoBackgroundCamera0);
 					_videoBackgroundCameraGO1 = CreateVideoBackgroundCamera("Video background (R)", (VideoIsStereo ? BackgroundLayer1 : BackgroundLayer0), out _videoBackgroundCamera1);
 					if (_videoBackgroundCameraGO0 == null || _videoBackgroundCamera0 == null || _videoBackgroundCameraGO1 == null || _videoBackgroundCamera1 == null) {
-						Log (LogTag + "Error: unable to create video background camera.");
+                        Debug.LogError("ARTK: " + LogTag + "Error: unable to create video background camera.");
 					}
 				}
 
@@ -737,7 +737,7 @@ public class ARController : MonoBehaviour
                     }
 				}
 
-				Log (LogTag + "Scene configured for video.");
+				Debug.Log("ARTK: " + LogTag + "Scene configured for video.");
 	            _sceneConfiguredForVideo = true;     
 	        } // !running
 		} // !sceneConfiguredForVideo
@@ -761,11 +761,11 @@ public class ARController : MonoBehaviour
             return false;
         }
         
-		Log(LogTag + "Stopping AR.");
+		Debug.Log("ARTK: " + LogTag + "Stopping AR.");
 
         // Stop video capture and marker detection.
     	if (!PluginFunctions.arwStopRunning()) {
-            Log(LogTag + "Error stopping AR.");
+            Debug.LogError("ARTK: " + LogTag + "Error stopping AR.");
         }
 		
 		// Clean up.
@@ -931,7 +931,7 @@ public class ARController : MonoBehaviour
 		set
 		{
 			currentTemplateSize = value;
-			Log (LogTag + "Warning: template size changed. Please reload scene.");
+			Debug.LogWarning("ARTK: " + LogTag + "Warning: template size changed. Please reload scene.");
 		}
 	}
 	
@@ -945,7 +945,7 @@ public class ARController : MonoBehaviour
 		set
 		{
 			currentTemplateCountMax = value;
-			Log (LogTag + "Warning: template maximum count changed. Please reload scene.");
+			Debug.LogWarning("ARTK: " + LogTag + "Warning: template maximum count changed. Please reload scene.");
 		}
 	}
 	
@@ -1096,7 +1096,7 @@ public class ARController : MonoBehaviour
 
 			// Mono.
 			if (_videoTexture0 == null) {
-				Log(LogTag + "Error: No video texture to update.");
+                Debug.LogError("ARTK: " + LogTag + "Error: No video texture to update.");
 			} else {
 
 				if (_useNativeGLTexturing) {
@@ -1152,7 +1152,7 @@ public class ARController : MonoBehaviour
 							//_frameStatsTimeApply += (st3 - st2);
 						}
 					} else {
-						Log(LogTag + "Error: No video color array to update.");
+                        Debug.LogError("ARTK: " + LogTag + "Error: No video color array to update.");
 					}
 
 					//_frameStatsCount++;
@@ -1170,7 +1170,7 @@ public class ARController : MonoBehaviour
 
 			// Stereo.
 			if (_videoTexture0 == null || _videoTexture1 == null) {
-				Log(LogTag + "Error: No video textures to update.");
+                Debug.LogError("ARTK: " + LogTag + "Error: No video textures to update.");
 			} else {
 				
 				if (_useNativeGLTexturing) {
@@ -1212,15 +1212,11 @@ public class ARController : MonoBehaviour
 							_videoTexture1.Apply(false);
 						}
 					} else {
-						Log(LogTag + "Error: No video color array to update.");
+                        Debug.LogError("ARTK: " + LogTag + "Error: No video color array to update.");
 					}
 				}
 			}
-
-
 		}
-
-
     }
 
 	private bool CreateClearCamera()
@@ -1250,7 +1246,7 @@ public class ARController : MonoBehaviour
 	{
 		// Check parameters.
 		if (w <= 0 || h <= 0) {
-			Log(LogTag + "Error: Cannot configure video texture with invalid video size: " + w + "x" + h);
+            Debug.LogError("ARTK: " + LogTag + "Error: Cannot configure video texture with invalid video size: " + w + "x" + h);
 			vbca = null; vbc32a = null; vbt = null; vbm = null;
 			return null;
 		}
@@ -1258,7 +1254,7 @@ public class ARController : MonoBehaviour
 		// Create new GameObject to hold mesh.
 		GameObject vbmgo = new GameObject("Video source " + index);
 		if (vbmgo == null) {
-			Log(LogTag + "Error: CreateVideoBackgroundCamera cannot create GameObject.");
+            Debug.LogError("ARTK: " + LogTag + "Error: CreateVideoBackgroundCamera cannot create GameObject.");
 			vbca = null; vbc32a = null; vbt = null; vbm = null;
 			return null;
 		}
@@ -1276,7 +1272,7 @@ public class ARController : MonoBehaviour
 			textureHeight = Mathf.ClosestPowerOfTwo(h);
 			if (textureHeight < h) textureHeight *= 2;
 		}*/
-		Log(LogTag + "Video size " + w + "x" + h + " will use texture size " + textureWidth + "x" + textureHeight + ".");
+		Debug.Log("ARTK: " + LogTag + "Video size " + w + "x" + h + " will use texture size " + textureWidth + "x" + textureHeight + ".");
 		
 		float textureScaleU = (float)w / (float)textureWidth;
 		float textureScaleV = (float)h / (float)textureHeight;
@@ -1336,7 +1332,7 @@ public class ARController : MonoBehaviour
 		// Create new GameObject to hold camera.
 		GameObject vbcgo = new GameObject(name);
 		if (vbcgo == null) {
-			Log(LogTag + "Error: CreateVideoBackgroundCamera cannot create GameObject.");
+            Debug.LogError("ARTK: " + LogTag + "Error: CreateVideoBackgroundCamera cannot create GameObject.");
 			vbc = null;
 			return null;
 		}
@@ -1344,7 +1340,7 @@ public class ARController : MonoBehaviour
 
 		vbc = vbcgo.AddComponent<Camera>();
 		if (vbc == null) {
-			Log(LogTag + "Error: CreateVideoBackgroundCamera cannot add Camera to GameObject.");
+            Debug.LogError("ARTK: " + LogTag + "Error: CreateVideoBackgroundCamera cannot add Camera to GameObject.");
 			return null;
 		}
 
@@ -1540,7 +1536,7 @@ public class ARController : MonoBehaviour
 				}
 			}
 			if (!ok) {
-				Log(LogTag + "Error setting up ARCamera.");
+                Debug.LogError("ARTK: " + LogTag + "Error setting up ARCamera.");
 			}
 		}
 
@@ -1633,7 +1629,7 @@ public class ARController : MonoBehaviour
                 3, 2, 0
             };
 
-        m.Optimize();
+        ;
 		return m;
     }
 
@@ -1641,7 +1637,14 @@ public class ARController : MonoBehaviour
     {
         // Add the new log message to the collection. If the collection has grown too large
         // then remove the oldest messages.
-        Debug.Log(msg);
+        string msgl = msg.ToLower();
+        if (msgl.Contains("error"))
+            Debug.LogError("ARTK: " + msg);
+        else if (msgl.Contains("warning"))
+            Debug.LogWarning("ARTK: " + msg);
+        else
+            Debug.Log("ARTK: " + msg);
+
         logMessages.Add(msg);
         while (logMessages.Count > MaximumLogMessages) logMessages.RemoveAt(0);
 

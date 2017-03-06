@@ -131,13 +131,13 @@ public class ARCamera : MonoBehaviour
 			float[] p = new float[16];
 			opticalSetupOK = PluginFunctions.arwLoadOpticalParams(null, OpticalParamsFileContents, OpticalParamsFileContents.Length, out fovy, out aspect, m, p);
 			if (!opticalSetupOK) {
-				ARController.Log(LogTag + "Error loading optical parameters.");
+                Debug.LogError("ARTK: " + LogTag + "Error loading optical parameters.");
 				return false;
 			}
 			m[12] *= 0.001f;
 			m[13] *= 0.001f;
 			m[14] *= 0.001f;
-			ARController.Log(LogTag + "Optical parameters: fovy=" + fovy  + ", aspect=" + aspect + ", camera position (m)={" + m[12].ToString("F3") + ", " + m[13].ToString("F3") + ", " + m[14].ToString("F3") + "}");
+            Debug.Log("ARTK: " + LogTag + "Optical parameters: fovy=" + fovy + ", aspect=" + aspect + ", camera position (m)={" + m[12].ToString("F3") + ", " + m[13].ToString("F3") + ", " + m[14].ToString("F3") + "}");
 			
 			c.projectionMatrix = ARUtilityFunctions.MatrixFromFloatArray(p);
 			

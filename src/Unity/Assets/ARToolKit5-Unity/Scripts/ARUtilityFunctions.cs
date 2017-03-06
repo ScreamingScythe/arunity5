@@ -94,7 +94,7 @@ public static class ARUtilityFunctions
 	{
 		// Trap the case where the matrix passed in has an invalid rotation submatrix.
 		if (m.GetColumn(2) == Vector4.zero) {
-			ARController.Log("QuaternionFromMatrix got zero matrix.");
+            Debug.LogWarning("ARTK: QuaternionFromMatrix got zero matrix.");
 			return Quaternion.identity;
 		}
 		return Quaternion.LookRotation(m.GetColumn(2), m.GetColumn(1));
