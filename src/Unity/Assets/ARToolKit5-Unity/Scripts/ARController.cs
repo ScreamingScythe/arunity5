@@ -486,12 +486,31 @@ public class ARController : MonoBehaviour
 	// User-callable AR methods.
 	//
 	
-	public bool StartAR()
+    public bool StartAR(bool cameraIsFrontFacing = false)
 	{
 		// Catch attempts to inadvertently call StartAR() twice.
         if (_running) {
             Debug.LogWarning("ARTK: " + LogTag + "WARNING: StartAR() called while already running. Ignoring.\n");
             return false;
+        }
+       
+        ScreenOrientation orientation = Screen.orientation;
+        if (orientation == ScreenOrientation.Portrait) { // Portait
+            ContentRotate90 = true;
+            ContentFlipV = false;
+            ContentFlipH = cameraIsFrontFacing;
+        } else if (orientation == ScreenOrientation.LandscapeLeft) { // Landscape with top of device at left.
+            ContentRotate90 = false;
+            ContentFlipV = false;
+            ContentFlipH = cameraIsFrontFacing;
+        } else if (orientation == ScreenOrientation.PortraitUpsideDown) { // Portrait upside-down.
+            ContentRotate90 = true;
+            ContentFlipV = true;
+            ContentFlipH = (!cameraIsFrontFacing);
+        } else if (orientation == ScreenOrientation.LandscapeRight) { // Landscape with top of device at right.
+            ContentRotate90 = false;
+            ContentFlipV = true;
+            ContentFlipH = (!cameraIsFrontFacing);
         }
         
         Debug.Log("ARTK: " + LogTag + "Starting AR.");
@@ -780,29 +799,7 @@ public class ARController : MonoBehaviour
 	// User-callable configuration methods.
 	//
 
-	// At present, you must call this before calling StartAR(), or after calling StopAR().
-	public void SetContentForScreenOrientation(bool cameraIsFrontFacing)
-	{
-		ScreenOrientation orientation = Screen.orientation;
-		if (orientation == ScreenOrientation.Portrait) { // Portait
-			ContentRotate90 = true;
-			ContentFlipV = false;
-			ContentFlipH = cameraIsFrontFacing;
-		} else if (orientation == ScreenOrientation.LandscapeLeft) { // Landscape with top of device at left.
-			ContentRotate90 = false;
-			ContentFlipV = false;
-			ContentFlipH = cameraIsFrontFacing;
-		} else if (orientation == ScreenOrientation.PortraitUpsideDown) { // Portrait upside-down.
-			ContentRotate90 = true;
-			ContentFlipV = true;
-			ContentFlipH = (!cameraIsFrontFacing);
-		} else if (orientation == ScreenOrientation.LandscapeRight) { // Landscape with top of device at right.
-			ContentRotate90 = false;
-			ContentFlipV = true;
-			ContentFlipH = (!cameraIsFrontFacing);
-		}
-	}
-
+	
     public void SetVideoAlpha(float a)
     {
         if (_videoMaterial0 != null) {
