@@ -1637,13 +1637,14 @@ public class ARController : MonoBehaviour
     {
         // Add the new log message to the collection. If the collection has grown too large
         // then remove the oldest messages.
+
+        msg = msg.Replace("ARController (native): [error]Loading ", "ARController (native): [info]Loading ");
+        msg = msg.Replace("ARController (native): [error]Unloading ", "ARController (native): [info]Unloading ");
+
         string msgl = msg.ToLower();
-        if (msgl.Contains("error"))
-            Debug.LogError("ARTK: " + msg);
-        else if (msgl.Contains("warning"))
-            Debug.LogWarning("ARTK: " + msg);
-        else
-            Debug.Log("ARTK: " + msg);
+        if (msgl.Contains("error")) Debug.LogError("ARTK: " + msg);
+        else if (msgl.Contains("warning")) Debug.LogWarning("ARTK: " + msg);
+        //else Debug.Log("ARTK: " + msg);
 
         logMessages.Add(msg);
         while (logMessages.Count > MaximumLogMessages) logMessages.RemoveAt(0);

@@ -265,7 +265,8 @@ public class ARMarker : MonoBehaviour
                     dir = OnDataSetPath();
                     foreach (string ext in NFTDataExts)
                     {
-                        string dataset = System.IO.Path.Combine(dir, NFTDataName + "." + ext);
+                        string dataset = FixPath( dir + "\\" +  NFTDataName + "." + ext );
+                        
                         if (!File.Exists(dataset))
                         {
                             Debug.LogError("ARMarker: Error load " + dataset);
@@ -278,8 +279,8 @@ public class ARMarker : MonoBehaviour
 
                 if (!string.IsNullOrEmpty(dir) && !string.IsNullOrEmpty(NFTDataName))
                 {
-                    cfg = "nft;" + System.IO.Path.Combine(dir, NFTDataName);
-                    //Debug.LogWarning("cfg --------------- " + cfg);
+                    cfg = FixPath("nft;" + dir + "\\" + NFTDataName);
+                    //Debug.LogWarning("CFG " + cfg);
                 }
                 break;
 
@@ -329,6 +330,13 @@ public class ARMarker : MonoBehaviour
 				}
 			}
 		}
+    }
+
+    public static string FixPath(string path)
+    {
+        char sepRight = Path.DirectorySeparatorChar;
+        char sepWrong = sepRight == '\\' ? '/' : '\\';
+        return path.Replace(sepWrong, sepRight);
     }
 
 	// We use Update() here, but be aware that unless ARController has been configured to

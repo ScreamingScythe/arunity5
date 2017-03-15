@@ -42,13 +42,11 @@ using System.Text;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
+#if UNITY_IPHONE  
 public static class ARNativePluginStatic
 {
-	
-	#if UNITY_IOS
 	[DllImport("__Internal")]
-	public static extern void aruRequestCamera();
-	#endif
+	public static extern void arwRequestCamera();	
 
 	[DllImport("__Internal")]
 	public static extern void arwRegisterLogCallback(PluginFunctions.LogCallback callback);
@@ -234,7 +232,6 @@ public static class ARNativePluginStatic
 	[DllImport("__Internal")]
 	[return: MarshalAsAttribute(UnmanagedType.I1)]
 	public static extern bool arwGetNFTMultiMode();
-	
 
 	[DllImport("__Internal", CharSet = CharSet.Ansi)]
 	public static extern int arwAddMarker(string cfg);
@@ -245,7 +242,6 @@ public static class ARNativePluginStatic
 	
 	[DllImport("__Internal")]
 	public static extern int arwRemoveAllMarkers();
-	
 	
 	[DllImport("__Internal")]
 	[return: MarshalAsAttribute(UnmanagedType.I1)]
@@ -262,6 +258,6 @@ public static class ARNativePluginStatic
 	[DllImport("__Internal", CharSet = CharSet.Ansi)]
 	[return: MarshalAsAttribute(UnmanagedType.I1)]
 	public static extern bool arwLoadOpticalParams(string optical_param_name, byte[] optical_param_buff, int optical_param_buffLen, out float fovy_p, out float aspect_p, [MarshalAs(UnmanagedType.LPArray, SizeConst=16)] float[] m, [MarshalAs(UnmanagedType.LPArray, SizeConst=16)] float[] p);
-	
-}
 
+}
+#endif
