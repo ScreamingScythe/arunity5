@@ -494,6 +494,7 @@ public class ARController : MonoBehaviour
             return false;
         }
        
+	#if !UNITY_EDITOR
         ScreenOrientation orientation = Screen.orientation;
         if (orientation == ScreenOrientation.Portrait) { // Portait
             ContentRotate90 = true;
@@ -512,6 +513,7 @@ public class ARController : MonoBehaviour
             ContentFlipV = true;
             ContentFlipH = (!cameraIsFrontFacing);
         }
+	#endif
         
         Debug.Log("ARTK: " + LogTag + "Starting AR.");
 
